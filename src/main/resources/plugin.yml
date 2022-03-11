@@ -1,0 +1,10 @@
+name: TntTag
+version: '${project.version}'
+main: me.shreyasayyengar.tnttag.TntTagPlugin
+api-version: 1.18
+prefix: TntTag
+authors: [ ShreyasAyyengar ]
+description: A hypixel TNT Tag recreation.
+
+commands:
+  tnttag:
