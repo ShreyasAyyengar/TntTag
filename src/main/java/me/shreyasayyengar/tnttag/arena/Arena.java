@@ -7,13 +7,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Arena {
 
     public static final int REQUIRED_PLAYERS = 1;
+
+    private final UUID arenaID = UUID.randomUUID();
 
     private final Set<TntPlayer> players = new HashSet<>();
     private final Set<TntPlayer> taggedPlayers = new HashSet<>();
@@ -55,7 +55,7 @@ public class Arena {
         int random = (int) (Math.random() * forTagged);
 //        return players.subList(random, players.size());
 
-        return this.players.stream().toList();
+        return players.subList(0, 1);
     }
     public Set<TntPlayer> getPlayers() {
         return players;
@@ -93,5 +93,13 @@ public class Arena {
         TntPlayer player = new TntPlayer(toJoin.getUniqueId(), this);
         players.add(player);
         toJoin.teleport(spawnPoint);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Arena arena = (Arena) o;
+        return Objects.equals(arenaID, arena.arenaID);
     }
 }

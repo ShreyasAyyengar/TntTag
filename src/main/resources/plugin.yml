@@ -8,3 +8,4 @@ description: A hypixel TNT Tag recreation.
 
 commands:
   tnttag:
+  join:

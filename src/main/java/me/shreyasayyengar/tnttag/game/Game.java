@@ -17,8 +17,9 @@ public class Game {
 
     private final Arena arena;
     private GameState state;
-    private int roundTime = 35;
+    private int roundTime = 10;
     private int roundNumber = 1;
+    private boolean isPaused;
 
     public Game(Arena arena) {
         this.arena = arena;
@@ -37,6 +38,8 @@ public class Game {
     }
 
     private void startGame() {
+
+        preparePlayers();
         List<Player> bukkitPlayers = arena.getPlayers().stream().map(TntPlayer::toBukkitPlayer).toList();
         bukkitPlayers.forEach(player -> {
             player.teleport(arena.getRegroupSpawnPoint());
@@ -51,6 +54,13 @@ public class Game {
         });
 
         startRoundRunnable();
+
+    }
+
+    private void preparePlayers() {
+        arena.getPlayers().forEach(TntPlayer::prepare);
+        arena.getTaggedPlayers().forEach(taggedPlayer -> arena.getTaggedScoreboard().addPlayer(taggedPlayer.toBukkitPlayer()));
+        CollectionUtils.subtract(arena.getPlayers(), arena.getTaggedPlayers()).forEach(regularPlayer -> arena.getRegularScoreboard().addPlayer(regularPlayer.toBukkitPlayer()));
 
     }
 
@@ -72,12 +82,8 @@ public class Game {
                 "Goal: &aRun Away!"
         ));
 
-        arena.getTaggedPlayers().forEach(taggedPlayer -> arena.getTaggedScoreboard().addPlayer(taggedPlayer.toBukkitPlayer()));
-        CollectionUtils.subtract(arena.getPlayers(), arena.getTaggedPlayers()).forEach(regularPlayer -> arena.getRegularScoreboard().addPlayer(regularPlayer.toBukkitPlayer()));
 
         new BukkitRunnable() {
-
-            boolean roundCharging = true;
 
             @Override
             public void run() {
@@ -103,17 +109,17 @@ public class Game {
 
                         Game.this.roundTime--;
                     } else {
-                        System.out.println("Elminated tagged players");
-
+                        eliminateTaggedPlayers();
+                        cancel();
                     }
                 } else {
-                    // TODO: End game and annouce winner
+                    // TODO: End game and announce winner
                     cancel();
                 }
 
             }
 
-        }.runTaskTimer(TntTagPlugin.getInstance(), 20L, 20);
+        }.runTaskTimer(TntTagPlugin.getInstance(), 0L, 20L);
     }
 
     private void eliminateTaggedPlayers() {
@@ -121,8 +127,16 @@ public class Game {
 
         arena.getTaggedPlayers().clear();
         arena.getRegularScoreboard().updateScoreboard();
+        isPaused = true;
         roundNumber++;
-        roundTime = 35;
+        roundTime = 10;
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                startRoundRunnable();
+            }
+        }.runTaskLater(TntTagPlugin.getInstance(), 90L);
     }
 
     private void startCountdown() {
@@ -140,5 +154,9 @@ public class Game {
                 }
             }
         }.runTaskTimer(TntTagPlugin.getInstance(), 0, 20);
+    }
+
+    public GameState getState() {
+        return state;
     }
 }

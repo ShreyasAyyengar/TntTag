@@ -43,6 +43,18 @@ public class GameManager {
         return arena;
     }
 
+    public static TntPlayer getGamePlayer(UUID uuid) {
+        for (Arena arena : arenas) {
+            for (TntPlayer arenaPlayer : arena.getPlayers()) {
+                if (arenaPlayer.getUUID().equals(uuid)) {
+                    return arenaPlayer;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public static void removeArena(Arena arena) {
         arenas.remove(arena);
     }

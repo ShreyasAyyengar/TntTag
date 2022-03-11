@@ -4,5 +4,5 @@ public enum GameState {
     WAITING,
     COUNTDOWN,
     LIVE,
-    WON
+    WON,
 }
